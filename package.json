@@ -1,0 +1,16 @@
+{
+  "name": "lish-starter-kit",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://www.lisonghe.cn:9001/xingyun1li/lish-starter-kit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
