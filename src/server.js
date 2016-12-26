@@ -5,14 +5,16 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import React from 'react';
 import ReactDom from 'react-dom/server';
+import jwt from 'jsonwebtoken';
+import expressJwt from 'express-jwt';
 
 import passport from './core/passport';
+import { port, auth } from './config';
 
 import App from 'components/App';
 import Html from 'components/Html';
 
 const app = express();
-const port = process.env.PORT || 3000;
 
 //如果userAgent没有给定，就使用'all'
 global.navigator = global.navigator || {};
@@ -25,17 +27,30 @@ app.use(bodyParser.urlencoded({entended: true}));
 app.use(bodyParser.json());
 
 //Authentication
+app.use(expressJwt({
+  secret: auth.jwt.secret,
+  credentialsRequired: false,
+  getToken: req => req.cookies.id_token
+}));
 app.use(passport.initialize());
 
-app.get('/login', passport.authenticate('github', {scrope: ['user:email']}), (req, res) => {
-  res.status(200);
-  res.send('login page');
+app.get('/login/github', passport.authenticate('github', {scrope: ['user:email'], session: false}));
+
+app.get('/welcome', (req, res) => {
+  if(req.user) {
+    res.status(200);
+    res.send(`Hello, ${req.user.displayName}`);
+  }else {
+    res.redirect('/login/github')
+  }
 });
 
 app.get('/auth/github/callback',
   passport.authenticate('github', { failureRedirect: '/', session: false}),
   (req, res) => {
-    res.status(200);
+    const expiresIn = 60 * 60 * 24 * 30; //30 days
+    const token = jwt.sign(req.user, auth.jwt.secret, { expiresIn });
+    res.cookie('id_token', token, { maxAge: 1000 * expiresIn, httpOnly: true});
     res.send(req.user);
   }
 );

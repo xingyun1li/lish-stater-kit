@@ -10,8 +10,12 @@ passport.use(new GithubStrategy({
   clientSecret: config.github.secret,
   callbackURL: '/auth/github/callback'
 }, (accessToken, refreshToken, profile, done) => {
-    console.log(JSON.stringify({accessToken}));
-    done(null, profile);
+    const user = {
+      id: profile.id,
+      displayName: profile.displayName,
+      email: profile.emails[0].value
+    };
+    done(null, user);
   }
 ));
 
