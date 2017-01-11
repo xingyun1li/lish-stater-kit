@@ -48,6 +48,13 @@ const config = {
     cashed: isVerbose,
     cachedAssets: isVerbose
   },
+  performance: isDebug ? { hints: false } : { hints: true },
+  devServer: {
+    historyApiFallback: true,
+    hot: true,
+    hotOnly: true,
+    stats: 'errors-only'
+  },
   plugins: [
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': isDebug ? '"development"' : '"production"',
@@ -60,7 +67,11 @@ const config = {
 
     new webpack.BannerPlugin('require("source-map-support").install();',
       {raw: true, entryOnly: false}
-    )
+    ),
+
+    new webpack.NamedModulesPlugin(),
+
+    new webpack.HotModuleReplacementPlugin()
   ],
   devtool: isDebug ? 'cheap-module-source-map' : 'source-map'
 };

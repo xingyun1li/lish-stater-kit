@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
+    "build-dev": "nodemon --watch webpack.config.js --exec \"webpack-dev-server --env development\"",
     "start": "node build/bundle.js"
   },
   "repository": {
@@ -34,6 +35,8 @@
     "babel-preset-stage-0": "^6.16.0",
     "babel-preset-stage-3": "^6.17.0",
     "json-loader": "^0.5.4",
-    "webpack": "^1.14.0"
+    "nodemon": "^1.11.0",
+    "webpack": "^1.14.0",
+    "webpack-dev-server": "^1.16.2"
   }
 }
