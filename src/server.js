@@ -11,8 +11,8 @@ import expressJwt from 'express-jwt';
 import passport from './core/passport';
 import { port, auth } from './config';
 
-import App from 'components/App';
-import Html from 'components/Html';
+import App from './components/App';
+import Html from './components/Html';
 
 const app = express();
 

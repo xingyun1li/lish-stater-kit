@@ -3,12 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack",
-    "build-dev": "nodemon --watch webpack.config.js --exec \"webpack-dev-server --env development\"",
-    "start": "node build/bundle.js"
-  },
   "repository": {
     "type": "git",
     "url": "http://www.lisonghe.cn:9001/xingyun1li/lish-starter-kit"
@@ -17,11 +11,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "babel-polyfill": "^6.23.0",
     "body-parser": "^1.15.2",
     "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
     "express-jwt": "^5.1.0",
     "jsonwebtoken": "^7.2.1",
+    "lodash": "^4.17.4",
     "passport": "^0.3.2",
     "passport-github2": "^0.1.10",
     "passport-local": "^1.0.0",
@@ -29,14 +25,36 @@
     "react-dom": "^15.4.1"
   },
   "devDependencies": {
+    "assets-webpack-plugin": "^3.5.1",
+    "babel-cli": "^6.23.0",
     "babel-core": "^6.21.0",
     "babel-loader": "^6.2.10",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-react": "^6.16.0",
     "babel-preset-stage-0": "^6.16.0",
     "babel-preset-stage-3": "^6.17.0",
+    "chunk-manifest-webpack-plugin": "^1.0.0",
+    "extend": "^3.0.0",
     "json-loader": "^0.5.4",
     "nodemon": "^1.11.0",
-    "webpack": "^1.14.0",
-    "webpack-dev-server": "^1.16.2"
+    "webpack": "^2.2.1",
+    "webpack-dev-server": "^1.16.2",
+    "webpack-manifest-plugin": "^1.1.0"
+  },
+  "babel": {
+    "presets": [
+      "es2015",
+      "react",
+      "stage-0"
+    ],
+    "plugins": [
+      "transform-runtime"
+    ]
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-dev": "nodemon --watch webpack.config.js --exec \"webpack-dev-server --env development\"",
+    "start": "node build/bundle.js",
+    "bundle": "babel-node tools/run bundle"
   }
 }
