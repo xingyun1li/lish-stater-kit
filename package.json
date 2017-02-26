@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": ">=6.5",
+    "npm": ">=3.10"
+  },
   "repository": {
     "type": "git",
     "url": "http://www.lisonghe.cn:9001/xingyun1li/lish-starter-kit"
@@ -33,13 +37,23 @@
     "babel-preset-react": "^6.16.0",
     "babel-preset-stage-0": "^6.16.0",
     "babel-preset-stage-3": "^6.17.0",
+    "browser-sync": "^2.18.8",
+    "chokidar": "^1.6.1",
     "chunk-manifest-webpack-plugin": "^1.0.0",
     "extend": "^3.0.0",
+    "glob": "^7.1.1",
     "json-loader": "^0.5.4",
+    "mkdirp": "^0.5.1",
     "nodemon": "^1.11.0",
+    "react-hot-loader": "^3.0.0-beta.6",
+    "rimraf": "^2.6.1",
     "webpack": "^2.2.1",
+    "webpack-bundle-analyzer": "^2.3.0",
+    "webpack-dev-middleware": "^1.10.1",
     "webpack-dev-server": "^1.16.2",
-    "webpack-manifest-plugin": "^1.1.0"
+    "webpack-hot-middleware": "^2.17.1",
+    "webpack-manifest-plugin": "^1.1.0",
+    "write-file-webpack-plugin": "^3.4.2"
   },
   "babel": {
     "presets": [
@@ -55,6 +69,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-dev": "nodemon --watch webpack.config.js --exec \"webpack-dev-server --env development\"",
     "start": "node build/bundle.js",
-    "bundle": "babel-node tools/run bundle"
+    "bundle": "babel-node tools/run bundle",
+    "bundle:stats": "yarn run bundle -- --release --analyse",
+    "bundle:watch": "yarn run bundle --watch",
+    "clean": "babel-node tools/run clean",
+    "build": "babel-node tools/run build"
   }
 }

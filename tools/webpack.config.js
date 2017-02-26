@@ -1,12 +1,28 @@
 const path = require('path');
 const webpack = require('webpack');
 const AssetsPlugin = require('assets-webpack-plugin');
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
 const isDebug = !process.argv.includes('--release');
 const isVerbose = process.argv.includes('--verbose');
+const isAnalyse = process.argv.includes('--analyse') || process.argv.includes('--analyze');     //...
+const port = parseInt(process.env.PORT || '3000', 10);
+const analyzerPort = port + 3;
+
+let analyzerMode = 'disabled';
+if (isAnalyse) {
+  analyzerMode = 'server';
+} else if (!isDebug) {
+  analyzerMode = 'static'
+}
 
 const config = {
   context: path.resolve(__dirname, '../src'),
+  output: {
+    path: path.resolve(__dirname, '../build/public/assets'),
+    publicPath: '/assets/',
+    pathinfo: isVerbose
+  },
   module: {
     rules: [
       {
@@ -18,6 +34,9 @@ const config = {
         }
       }
     ]
+  },
+  resolve: {
+    modules: [path.resolve(__dirname, '../src'), 'node_modules']
   },
   stats: {
     colors: true,
@@ -42,7 +61,7 @@ const clientConfig = {
   },
 
   output: {
-    path: path.resolve(__dirname, '../build'),
+    ...config.output,
     filename: isDebug ? '[name].js' : '[name].[chunkhash:8].js',
     chunkFilename: isDebug ? '[name].chunk.js' : '[name].[chunkhash:8].chunk.js',
   },
@@ -83,6 +102,18 @@ const clientConfig = {
         },
       }),
     ],
+
+    new BundleAnalyzerPlugin({
+      analyzerMode,
+      analyzerHost: '127.0.0.1',
+      analyzerPort,
+      reportFilename: path.resolve(__dirname, '../report.html'),
+      openAnalyzer: true,
+      generateStatsFile: !isDebug,
+      statsFilename: path.resolve(__dirname, '../stats.json'),
+      statsOptions: null,
+      logLevel: 'info'
+    })
   ],
   devtool: isDebug ? 'cheap-module-source-map' : false,
   node: {
@@ -98,11 +129,40 @@ const serverConfig = {
     server: './server.js',
   },
   output: {
-    path: path.resolve(__dirname, '../build'),
-    filename: isDebug ? '[name].js' : '[name].[chunkhash].js',
-    chunkFilename: isDebug ? '[name].chunk.js' : '[name].[chunkhash].chunk.js'
+    ...config.output,
+    filename: '../../server.js',
+    libraryTarget: 'commonjs2'
   },
   target: 'node',
+  module: {
+    ...config.module,
+
+    // Override babel-preset-env configuration for Node.js
+    rules: config.module.rules.map(rule => (rule.loader !== 'babel-loader' ? rule : {
+      ...rule,
+      query: {
+        ...rule.query,
+        presets: rule.query.presets.map(preset => (preset[0] !== 'env' ? preset : ['env', {
+          targets: {
+            node: parseFloat(pkg.engines.node.replace(/^\D+/g, '')),
+          },
+          modules: false,
+          useBuiltIns: false,
+          debug: false,
+        }])),
+      },
+    })),
+  },
+  resolve: { ...config.resolve},
+  externals: [
+    /^\.\/assets\.json$/,
+    (context, request, callback) => {
+      const isExternal =
+        request.match(/^[@a-z][a-z/.\-0-9]*$/i) &&
+        !request.match(/\.(css|less|scss|sss)$/i);
+      callback(null, Boolean(isExternal));
+    },
+  ],
   plugins: [
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': isDebug ? '"development"' : '"production"',
