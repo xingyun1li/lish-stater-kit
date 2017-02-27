@@ -1,12 +1,3 @@
-/**
- * React Starter Kit (https://www.reactstarterkit.com/)
- *
- * Copyright © 2014-present Kriasoft, LLC. All rights reserved.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE.txt file in the root directory of this source tree.
- */
-
 import browserSync from 'browser-sync';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
@@ -52,15 +43,8 @@ async function start() {
 
     const bundler = webpack(webpackConfig);
     const wpMiddleware = webpackDevMiddleware(bundler, {
-      // IMPORTANT: webpack middleware can't access config,
-      // so we should provide publicPath by ourselves
       publicPath: clientConfig.output.publicPath,
-
-      // Pretty colored output
       stats: clientConfig.stats,
-
-      // For other settings see
-      // https://webpack.github.io/docs/webpack-dev-middleware
     });
     const hotMiddleware = webpackHotMiddleware(bundler.compilers[0]);
 

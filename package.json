@@ -25,8 +25,10 @@
     "passport": "^0.3.2",
     "passport-github2": "^0.1.10",
     "passport-local": "^1.0.0",
+    "pug": "^2.0.0-beta11",
     "react": "^15.4.1",
-    "react-dom": "^15.4.1"
+    "react-dom": "^15.4.1",
+    "universal-router": "^2.0.0"
   },
   "devDependencies": {
     "assets-webpack-plugin": "^3.5.1",
@@ -35,18 +37,21 @@
     "babel-loader": "^6.2.10",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-react": "^6.16.0",
+    "babel-preset-react-optimize": "^1.0.1",
     "babel-preset-stage-0": "^6.16.0",
     "babel-preset-stage-3": "^6.17.0",
     "browser-sync": "^2.18.8",
     "chokidar": "^1.6.1",
     "chunk-manifest-webpack-plugin": "^1.0.0",
     "extend": "^3.0.0",
+    "file-loader": "^0.10.1",
     "glob": "^7.1.1",
     "json-loader": "^0.5.4",
     "mkdirp": "^0.5.1",
     "nodemon": "^1.11.0",
     "react-hot-loader": "^3.0.0-beta.6",
     "rimraf": "^2.6.1",
+    "url-loader": "^0.5.8",
     "webpack": "^2.2.1",
     "webpack-bundle-analyzer": "^2.3.0",
     "webpack-dev-middleware": "^1.10.1",
@@ -67,12 +72,12 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-dev": "nodemon --watch webpack.config.js --exec \"webpack-dev-server --env development\"",
-    "start": "node build/bundle.js",
-    "bundle": "babel-node tools/run bundle",
-    "bundle:stats": "yarn run bundle -- --release --analyse",
-    "bundle:watch": "yarn run bundle --watch",
     "clean": "babel-node tools/run clean",
-    "build": "babel-node tools/run build"
+    "copy": "babel-node tools/run copy",
+    "bundle": "babel-node tools/run bundle",
+    "build": "babel-node tools/run build",
+    "build:stats": "yarn run build -- --release --analyse",
+    "serve": "babel-node tools/run runServer",
+    "start": "babel-node tools/run start"
   }
 }

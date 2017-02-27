@@ -1,11 +1,12 @@
-const path = require('path');
-const webpack = require('webpack');
-const AssetsPlugin = require('assets-webpack-plugin');
+import path from 'path';
+import webpack from 'webpack';
+import AssetsPlugin from 'assets-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+import pkg from '../package.json';
 
 const isDebug = !process.argv.includes('--release');
 const isVerbose = process.argv.includes('--verbose');
-const isAnalyse = process.argv.includes('--analyse') || process.argv.includes('--analyze');     //...
+const isAnalyse = process.argv.includes('--analyse') || process.argv.includes('--analyze');
 const port = parseInt(process.env.PORT || '3000', 10);
 const analyzerPort = port + 3;
 
@@ -13,34 +14,79 @@ let analyzerMode = 'disabled';
 if (isAnalyse) {
   analyzerMode = 'server';
 } else if (!isDebug) {
-  analyzerMode = 'static'
+  analyzerMode = 'static';
 }
 
 const config = {
   context: path.resolve(__dirname, '../src'),
+
   output: {
     path: path.resolve(__dirname, '../build/public/assets'),
     publicPath: '/assets/',
-    pathinfo: isVerbose
+    pathinfo: isVerbose,
   },
+
   module: {
     rules: [
       {
         test: /\.js$/,
-        exclude: /node_modules/,
         loader: 'babel-loader',
+        include: [
+          path.resolve(__dirname, '../src'),
+        ],
         query: {
-          presets: ['es2015', 'stage-0', 'react']
-        }
-      }
-    ]
+          // https://github.com/babel/babel-loader#options
+          cacheDirectory: isDebug,
+
+          babelrc: false,
+          presets: [
+            'es2015',
+            'stage-0',
+            'react',
+            ...isDebug ? [] : ['react-optimize'],
+          ],
+          plugins: [
+            // Adds component stack to warning messages
+            // https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-jsx-source
+            ...isDebug ? ['transform-react-jsx-source'] : [],
+            // Adds __self attribute to JSX which React will use for some warnings
+            // https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-jsx-self
+            ...isDebug ? ['transform-react-jsx-self'] : [],
+          ],
+        },
+      },
+      {
+        test: /\.txt$/,
+        loader: 'raw-loader',
+      },
+      {
+        test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,
+        loader: 'file-loader',
+        query: {
+          name: isDebug ? '[path][name].[ext]?[hash:8]' : '[hash:8].[ext]',
+        },
+      },
+      {
+        test: /\.(mp4|webm|wav|mp3|m4a|aac|oga)(\?.*)?$/,
+        loader: 'url-loader',
+        query: {
+          name: isDebug ? '[path][name].[ext]?[hash:8]' : '[hash:8].[ext]',
+          limit: 10000,
+        },
+      },
+    ],
   },
+
   resolve: {
-    modules: [path.resolve(__dirname, '../src'), 'node_modules']
+    modules: [path.resolve(__dirname, '../src'), 'node_modules'],
   },
+
+  bail: !isDebug,
+
+  cache: isDebug,
+
   stats: {
     colors: true,
-    warnings: isVerbose,
     reasons: isDebug,
     hash: isVerbose,
     version: isVerbose,
@@ -48,16 +94,18 @@ const config = {
     chunks: isVerbose,
     chunkModules: isVerbose,
     cached: isVerbose,
-    cachedAssets: isVerbose
+    cachedAssets: isVerbose,
   },
-  bail: !isDebug,
-  cache: isDebug
 };
 
 const clientConfig = {
   ...config,
+
+  name: 'client',
+  target: 'web',
+
   entry: {
-    client: './client.js',
+    client: ['babel-polyfill', './client.js'],
   },
 
   output: {
@@ -66,7 +114,7 @@ const clientConfig = {
     chunkFilename: isDebug ? '[name].chunk.js' : '[name].[chunkhash:8].chunk.js',
   },
 
-  target: 'web',
+  resolve: { ...config.resolve },
 
   plugins: [
     new webpack.DefinePlugin({
@@ -77,21 +125,21 @@ const clientConfig = {
     new AssetsPlugin({
       path: path.resolve(__dirname, '../build'),
       filename: 'assets.json',
-      prettyPrint: true
+      prettyPrint: true,
     }),
-
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
-      minChunks: module => /node_modules/.test(module.resource),
+      minChunks: module => /node_modules/.test(module.resource)
     }),
 
     ...isDebug ? [] : [
-      new webpack.optimize.OccurrenceOrderPlugin(true),
-      new webpack.optimize.DedupePlugin(),
       new webpack.optimize.UglifyJsPlugin({
+        sourceMap: true,
         compress: {
           screw_ie8: true, // React doesn't support IE8
           warnings: isVerbose,
+          unused: true,
+          dead_code: true,
         },
         mangle: {
           screw_ie8: true,
@@ -104,18 +152,39 @@ const clientConfig = {
     ],
 
     new BundleAnalyzerPlugin({
+      // See above
       analyzerMode,
+      // Host that will be used in `server` mode to start HTTP server.
       analyzerHost: '127.0.0.1',
+      // Port that will be used in `server` mode to start HTTP server.
       analyzerPort,
+      // Path to bundle report file that will be generated in `static` mode.
+      // Relative to bundles output directory.
       reportFilename: path.resolve(__dirname, '../report.html'),
+      // Automatically open report in default browser
       openAnalyzer: true,
+      // If `true`, Webpack Stats JSON file will be generated in bundles output directory
       generateStatsFile: !isDebug,
+      // Name of Webpack Stats JSON file that will be generated if `generateStatsFile` is `true`.
+      // Relative to bundles output directory.
       statsFilename: path.resolve(__dirname, '../stats.json'),
+      // Options for `stats.toJson()` method.
+      // You can exclude sources of your modules from stats file with `source: false` option.
+      // See more options here: https://github.com/webpack/webpack/blob/webpack-1/lib/Stats.js#L21
       statsOptions: null,
-      logLevel: 'info'
-    })
+      // Log level. Can be 'info', 'warn', 'error' or 'silent'.
+      logLevel: 'info',
+    }),
   ],
+
+  // Choose a developer tool to enhance debugging
+  // http://webpack.github.io/docs/configuration.html#devtool
   devtool: isDebug ? 'cheap-module-source-map' : false,
+
+  // Some libraries import Node modules but don't use them in the browser.
+  // Tell Webpack to provide empty mocks for them so importing them works.
+  // https://webpack.github.io/docs/configuration.html#node
+  // https://github.com/webpack/node-libs-browser/tree/master/mock
   node: {
     fs: 'empty',
     net: 'empty',
@@ -123,17 +192,26 @@ const clientConfig = {
   },
 };
 
+//
+// Configuration for the server-side bundle (server.js)
+// -----------------------------------------------------------------------------
+
 const serverConfig = {
   ...config,
+
+  name: 'server',
+  target: 'node',
+
   entry: {
-    server: './server.js',
+    server: ['babel-polyfill', './server.js'],
   },
+
   output: {
     ...config.output,
     filename: '../../server.js',
-    libraryTarget: 'commonjs2'
+    libraryTarget: 'commonjs2',
   },
-  target: 'node',
+
   module: {
     ...config.module,
 
@@ -153,7 +231,9 @@ const serverConfig = {
       },
     })),
   },
-  resolve: { ...config.resolve},
+
+  resolve: { ...config.resolve },
+
   externals: [
     /^\.\/assets\.json$/,
     (context, request, callback) => {
@@ -163,15 +243,39 @@ const serverConfig = {
       callback(null, Boolean(isExternal));
     },
   ],
+
   plugins: [
+    // Define free variables
+    // https://webpack.github.io/docs/list-of-plugins.html#defineplugin
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': isDebug ? '"development"' : '"production"',
       'process.env.BROWSER': false,
       __DEV__: isDebug,
     }),
-    new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 })
+
+    // Do not create separate chunks of the server bundle
+    // https://webpack.github.io/docs/list-of-plugins.html#limitchunkcountplugin
+    new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }),
+
+    // Adds a banner to the top of each generated chunk
+    // https://webpack.github.io/docs/list-of-plugins.html#bannerplugin
+    new webpack.BannerPlugin({
+      banner: 'require("source-map-support").install();',
+      raw: true,
+      entryOnly: false,
+    }),
   ],
-  devtool: isDebug ? 'cheap-module-source-map' : 'source-map'
+
+  node: {
+    console: false,
+    global: false,
+    process: false,
+    Buffer: false,
+    __filename: false,
+    __dirname: false,
+  },
+
+  devtool: isDebug ? 'cheap-module-source-map' : 'source-map',
 };
 
-module.exports = [serverConfig, clientConfig];
+export default [clientConfig, serverConfig];

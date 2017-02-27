@@ -11,8 +11,8 @@ import expressJwt from 'express-jwt';
 import passport from './core/passport';
 import { port, auth } from './config';
 
-import App from './components/App';
 import Html from './components/Html';
+import assets from './assets.json';
 
 const app = express();
 
@@ -51,17 +51,18 @@ app.get('/auth/github/callback',
     const expiresIn = 60 * 60 * 24 * 30; //30 days
     const token = jwt.sign(req.user, auth.jwt.secret, { expiresIn });
     res.cookie('id_token', token, { maxAge: 1000 * expiresIn, httpOnly: true});
-    res.send(req.user);
+    res.redirect('/');
   }
 );
-//test html template
+
 app.get('/', (req, res) => {
   const data = {};
   data.title = 'title';
   data.description = 'des';
-  data.children = ReactDom.renderToString(<App/>);
-  data.style = "body{ color: red}";
-  data.scripts = [];
+  data.scripts = [
+    assets.vendor.js,
+    assets.client.js
+  ];
 
   const html = ReactDom.renderToStaticMarkup(<Html {...data} />);
   res.status(200);
