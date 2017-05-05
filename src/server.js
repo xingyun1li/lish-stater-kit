@@ -7,6 +7,10 @@ import React from 'react';
 import ReactDom from 'react-dom/server';
 import jwt from 'jsonwebtoken';
 import expressJwt from 'express-jwt';
+import PrettyError from 'pretty-error';
+
+import router from './router';
+import ErrorPageWithoutStyle from './routes/error/ErrorPage';
 
 import passport from './core/passport';
 import { port, auth } from './config';
@@ -55,9 +59,33 @@ app.get('/auth/github/callback',
   }
 );
 
-app.get('/', (req, res) => {
-  const data = {};
-  data.title = 'title';
+// app.get('/', (req, res) => {
+//   const data = {};
+//   data.title = 'title';
+//   data.description = 'des';
+//   data.scripts = [
+//     assets.vendor.js,
+//     assets.client.js
+//   ];
+//
+//   const html = ReactDom.renderToStaticMarkup(<Html {...data} />);
+//   res.status(200);
+//   res.send(`<!doctype html>${html}`);
+// });
+
+app.get('*', async (req, res, next) => {
+  const route = await router.resolve({
+    path: req.path,
+    query: req.query,
+  });
+  if (route.redirect) {
+    res.redirect(route.status || 302, route.redirect);
+    return;
+  }
+  const data = {...route};
+  data.children = ReactDom.renderToString(
+    route.component
+  );
   data.description = 'des';
   data.scripts = [
     assets.vendor.js,
@@ -66,6 +94,27 @@ app.get('/', (req, res) => {
 
   const html = ReactDom.renderToStaticMarkup(<Html {...data} />);
   res.status(200);
+  res.send(`<!doctype html>${html}`);
+});
+
+//
+// Error handling
+// -----------------------------------------------------------------------------
+const pe = new PrettyError();
+pe.skipNodeFiles();
+pe.skipPackage('express');
+
+app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
+  console.error(pe.render(err));
+  const html = ReactDom.renderToStaticMarkup(
+    <Html
+      title="Internal Server Error"
+      description={err.message}
+    >
+    {ReactDom.renderToString(<ErrorPageWithoutStyle error={err} />)}
+    </Html>,
+  );
+  res.status(err.status || 500);
   res.send(`<!doctype html>${html}`);
 });
 

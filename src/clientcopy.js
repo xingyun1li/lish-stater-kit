@@ -1,12 +1,18 @@
+/**
+ * React Starter Kit (https://www.reactstarterkit.com/)
+ *
+ * Copyright © 2014-present Kriasoft, LLC. All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE.txt file in the root directory of this source tree.
+ */
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import queryString from 'query-string';
-import FastClick from 'fastclick';
+import { createPath } from 'history/PathUtils';
+import App from './components/App';
 import history from './history';
-import router from './router';
-import { updateMeta } from './DOMUtils'
-import { ErrorReporter, deepForceUpdate } from './devUtils';
-
 
 /* eslint-disable global-require */
 
@@ -32,16 +38,16 @@ import { ErrorReporter, deepForceUpdate } from './devUtils';
 
 // Switch off the native scroll restoration behavior and handle it manually
 // https://developers.google.com/web/updates/2015/09/history-api-scroll-restoration
-const scrollPositionsHistory = {};
-if (window.history && 'scrollRestoration' in window.history) {
-  window.history.scrollRestoration = 'manual';
-}
+// const scrollPositionsHistory = {};
+// if (window.history && 'scrollRestoration' in window.history) {
+//   window.history.scrollRestoration = 'manual';
+// }
 
 let onRenderComplete = function initialRenderComplete() {
   onRenderComplete = function renderComplete(route, location) {
     document.title = route.title;
 
-    updateMeta('description', route.description);
+    // updateMeta('description', route.description);
     // Update necessary tags in <head> at runtime here, ie:
     // updateMeta('keywords', route.keywords);
     // updateCustomMeta('og:url', route.canonicalUrl);
@@ -49,47 +55,54 @@ let onRenderComplete = function initialRenderComplete() {
     // updateLink('canonical', route.canonicalUrl);
     // etc.
 
-    let scrollX = 0;
-    let scrollY = 0;
-    const pos = scrollPositionsHistory[location.key];
-    if (pos) {
-      scrollX = pos.scrollX;
-      scrollY = pos.scrollY;
-    } else {
-      const targetHash = location.hash.substr(1);
-      if (targetHash) {
-        const target = document.getElementById(targetHash);
-        if (target) {
-          scrollY = window.pageYOffset + target.getBoundingClientRect().top;
-        }
-      }
-    }
+    // let scrollX = 0;
+    // let scrollY = 0;
+    // const pos = scrollPositionsHistory[location.key];
+    // if (pos) {
+    //   scrollX = pos.scrollX;
+    //   scrollY = pos.scrollY;
+    // } else {
+    //   const targetHash = location.hash.substr(1);
+    //   if (targetHash) {
+    //     const target = document.getElementById(targetHash);
+    //     if (target) {
+    //       scrollY = window.pageYOffset + target.getBoundingClientRect().top;
+    //     }
+    //   }
+    // }
+    //
+    // // Restore the scroll position if it was saved into the state
+    // // or scroll to the given #hash anchor
+    // // or scroll to top of the page
+    // window.scrollTo(scrollX, scrollY);
 
-    // Restore the scroll position if it was saved into the state
-    // or scroll to the given #hash anchor
-    // or scroll to top of the page
-    window.scrollTo(scrollX, scrollY);
+    // Google Analytics tracking. Don't send 'pageview' event after
+    // the initial rendering, as it was already sent
+    // if (window.ga) {
+    //   window.ga('send', 'pageview', createPath(location));
+    // }
   };
 };
 
 // Make taps on links and buttons work fast on mobiles
-FastClick.attach(document.body);
+// FastClick.attach(document.body);
 
 const container = document.getElementById('app');
 let appInstance;
 let currentLocation = history.location;
+let router = require('./router').default;
 
 // Re-render the app when window.location changes
 async function onLocationChange(location, action) {
   // Remember the latest scroll position for the previous location
-  scrollPositionsHistory[currentLocation.key] = {
-    scrollX: window.pageXOffset,
-    scrollY: window.pageYOffset,
-  };
+  // scrollPositionsHistory[currentLocation.key] = {
+  //   scrollX: window.pageXOffset,
+  //   scrollY: window.pageYOffset,
+  // };
   // Delete stored scroll position for next page if any
-  if (action === 'PUSH') {
-    delete scrollPositionsHistory[location.key];
-  }
+  // if (action === 'PUSH') {
+  //   delete scrollPositionsHistory[location.key];
+  // }
   currentLocation = location;
 
   try {
@@ -134,11 +147,13 @@ async function onLocationChange(location, action) {
   }
 }
 
+// Handle client-side navigation by using HTML5 History API
+// For more information visit https://github.com/mjackson/history#readme
 history.listen(onLocationChange);
 onLocationChange(currentLocation);
 
 // Handle errors that might happen after rendering
-// // Display the error in full-screen for development mode
+// Display the error in full-screen for development mode
 if (__DEV__) {
   window.addEventListener('error', (event) => {
     appInstance = null;
@@ -150,6 +165,8 @@ if (__DEV__) {
 // Enable Hot Module Replacement (HMR)
 if (module.hot) {
   module.hot.accept('./router', () => {
+    router = require('./router').default;
+
     if (appInstance) {
       try {
         // Force-update the whole tree, including components that refuse to update
@@ -165,4 +182,3 @@ if (module.hot) {
     onLocationChange(currentLocation);
   });
 }
-
