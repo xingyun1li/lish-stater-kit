@@ -43,8 +43,15 @@ async function start() {
 
     const bundler = webpack(webpackConfig);
     const wpMiddleware = webpackDevMiddleware(bundler, {
+      // IMPORTANT: webpack middleware can't access config,
+      // so we should provide publicPath by ourselves
       publicPath: clientConfig.output.publicPath,
+
+      // Pretty colored output
       stats: clientConfig.stats,
+
+      // For other settings see
+      // https://webpack.github.io/docs/webpack-dev-middleware
     });
     const hotMiddleware = webpackHotMiddleware(bundler.compilers[0]);
 

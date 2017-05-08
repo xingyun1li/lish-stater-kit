@@ -2,6 +2,7 @@ import path from 'path';
 import cp from 'child_process';
 import webpackConfig from './webpack.config';
 
+// Should match the text string used in `src/server.js/server.listen(...)`
 const RUNNING_REGEXP = /The server is running at http:\/\/(.*?)\//;
 
 let server;
@@ -9,6 +10,7 @@ let pending = true;
 const [, serverConfig] = webpackConfig;
 const serverPath = path.join(serverConfig.output.path, serverConfig.output.filename);
 
+// Launch or restart the Node.js server
 function runServer() {
   return new Promise((resolve) => {
     function onStdOut(data) {
@@ -33,7 +35,7 @@ function runServer() {
 
     server = cp.spawn('node', [serverPath], {
       env: Object.assign({ NODE_ENV: 'development' }, process.env),
-      silent: false
+      silent: false,
     });
 
     if (pending) {
@@ -41,7 +43,7 @@ function runServer() {
         if (pending) {
           throw new Error(`Server terminated unexpectedly with code: ${code} signal: ${signal}`);
         }
-      })
+      });
     }
 
     server.stdout.on('data', onStdOut);
