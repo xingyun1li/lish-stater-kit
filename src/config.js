@@ -2,7 +2,7 @@ if (process.env.BROWSER) {
   throw new Error('Do not import `config.js` from inside the client-side code.');
 }
 
-module.exports = {
+const config =  {
   port: process.env.PORT || 3000,
   api: {
     // API URL to be used in the client-side code
@@ -30,3 +30,5 @@ export const auth = {
     secret: process.env.GITHUB_CLIENT_SECRET || '8a3a63f843392fceee711c0af0c457295780e56e'
   }
 };
+
+export default config;

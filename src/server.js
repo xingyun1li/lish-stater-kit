@@ -12,6 +12,8 @@ import PrettyError from 'pretty-error';
 import router from './router';
 import ErrorPageWithoutStyle from './routes/error/ErrorPage';
 import createFetch from './createFetch';
+import configureStore from './store/configureStore';
+import { setRuntimeVariable } from './actions/runtime';
 
 import passport from './passport';
 import config from './config';
@@ -29,7 +31,7 @@ global.navigator.userAgent = global.navigator.userAgent || 'all';
 //注册中间件
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
-app.use(bodyParser.urlencoded({entended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(expressJwt({
@@ -67,16 +69,36 @@ app.get('*', async (req, res, next) => {
       baseUrl: config.api.serverUrl,
       cookie: req.header.cookie,
     });
+
+    const initialState = {
+      user: req.user || null,
+    };
+
+    const store = configureStore(initialState, {
+      fetch,
+      // I should not use `history` on server.. but how I do redirection? follow universal-router
+    });
+
+    store.dispatch(setRuntimeVariable({
+      name: 'initialNow',
+      value: Date.now(),
+    }));
+
     const context = {
       insertCss: (...styles) => {
         // eslint-disable-next-line no-underscore-dangle
         styles.forEach(style => css.add(style._getCss()));
       },
       fetch,
+      store,
+      storeSubscription: null,
     };
     const route = await router.resolve({
       path: req.path,
       query: req.query,
+      // Any arbitrary data can be passed to the router.resolve() method, that becomes available inside action functions.
+      fetch,
+      store,
     });
     if (route.redirect) {
       res.redirect(route.status || 302, route.redirect);
@@ -90,6 +112,7 @@ app.get('*', async (req, res, next) => {
     );
     data.app = {
       apiUrl: config.api.clientUrl,
+      state: context.store.getState(),
     };
     data.description = 'des';
     data.scripts = [

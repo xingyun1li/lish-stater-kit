@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// import { Provider as ReduxProvider } from 'react-redux';
+import { Provider as ReduxProvider } from 'react-redux';
 
 const ContextType = {
   // Enables critical path CSS rendering
@@ -10,7 +10,7 @@ const ContextType = {
   fetch: PropTypes.func.isRequired,
   // Integrate Redux
   // http://redux.js.org/docs/basics/UsageWithReact.html
-  // ...ReduxProvider.childContextTypes,
+  ...ReduxProvider.childContextTypes,
 };
 
 /**
