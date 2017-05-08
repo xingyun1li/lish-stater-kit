@@ -10,7 +10,7 @@ import expressJwt from 'express-jwt';
 import PrettyError from 'pretty-error';
 
 import router from './router';
-import ErrorPageWithoutStyle from './routes/error/ErrorPage';
+import { ErrorPageWithoutStyle } from './routes/error/ErrorPage';
 import createFetch from './createFetch';
 import configureStore from './store/configureStore';
 import { setRuntimeVariable } from './actions/runtime';
@@ -20,15 +20,16 @@ import config from './config';
 
 import Html from './components/Html';
 import App from './components/App';
+// eslint-disable-next-line import/no-unresolved
 import assets from './assets.json';
 
 const app = express();
 
-//如果userAgent没有给定，就使用'all'
+// 如果userAgent没有给定，就使用'all'
 global.navigator = global.navigator || {};
 global.navigator.userAgent = global.navigator.userAgent || 'all';
 
-//注册中间件
+// 注册中间件
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -37,29 +38,29 @@ app.use(bodyParser.json());
 app.use(expressJwt({
   secret: config.auth.jwt.secret,
   credentialsRequired: false,
-  getToken: req => req.cookies.id_token
+  getToken: req => req.cookies.id_token,
 }));
 app.use(passport.initialize());
 
-app.get('/login/github', passport.authenticate('github', {scrope: ['user:email'], session: false}));
+app.get('/login/github', passport.authenticate('github', { scrope: ['user:email'], session: false }));
 
 app.get('/welcome', (req, res) => {
-  if(req.user) {
+  if (req.user) {
     res.status(200);
     res.send(`Hello, ${req.user.displayName}`);
-  }else {
-    res.redirect('/login/github')
+  } else {
+    res.redirect('/login/github');
   }
 });
 
 app.get('/auth/github/callback',
-  passport.authenticate('github', { failureRedirect: '/', session: false}),
+  passport.authenticate('github', { failureRedirect: '/', session: false }),
   (req, res) => {
-    const expiresIn = 60 * 60 * 24 * 30; //30 days
+    const expiresIn = 60 * 60 * 24 * 30; // 30 days
     const token = jwt.sign(req.user, config.auth.jwt.secret, { expiresIn });
-    res.cookie('id_token', token, { maxAge: 1000 * expiresIn, httpOnly: true});
+    res.cookie('id_token', token, { maxAge: 1000 * expiresIn, httpOnly: true });
     res.redirect('/');
-  }
+  },
 );
 
 app.get('*', async (req, res, next) => {
@@ -76,7 +77,7 @@ app.get('*', async (req, res, next) => {
 
     const store = configureStore(initialState, {
       fetch,
-      // I should not use `history` on server.. but how I do redirection? follow universal-router
+      //  I should not use `history` on server.. but how I do redirection? follow universal-router
     });
 
     store.dispatch(setRuntimeVariable({
@@ -86,7 +87,7 @@ app.get('*', async (req, res, next) => {
 
     const context = {
       insertCss: (...styles) => {
-        // eslint-disable-next-line no-underscore-dangle
+        //  eslint-disable-next-line no-underscore-dangle
         styles.forEach(style => css.add(style._getCss()));
       },
       fetch,
@@ -96,7 +97,8 @@ app.get('*', async (req, res, next) => {
     const route = await router.resolve({
       path: req.path,
       query: req.query,
-      // Any arbitrary data can be passed to the router.resolve() method, that becomes available inside action functions.
+// eslint-disable-next-line max-len
+      //  Any arbitrary data can be passed to the router.resolve() method, that becomes available inside action functions.
       fetch,
       store,
     });
@@ -104,11 +106,11 @@ app.get('*', async (req, res, next) => {
       res.redirect(route.status || 302, route.redirect);
       return;
     }
-    const data = {...route};
+    const data = { ...route };
     data.children = ReactDom.renderToString(
-      <App context={ context }>
+      <App context={context}>
         { route.component }
-      </App>
+      </App>,
     );
     data.app = {
       apiUrl: config.api.clientUrl,
@@ -117,7 +119,7 @@ app.get('*', async (req, res, next) => {
     data.description = 'des';
     data.scripts = [
       assets.vendor.js,
-      assets.client.js
+      assets.client.js,
     ];
     data.styles = [
       { id: 'css', cssText: [...css].join('') },
@@ -130,7 +132,7 @@ app.get('*', async (req, res, next) => {
   }
 });
 
-//错误处理
+// 错误处理
 const pe = new PrettyError();
 pe.skipNodeFiles();
 pe.skipPackage('express');
@@ -142,7 +144,7 @@ app.use((err, req, res) => {
       title="Internal Server Error"
       description={err.message}
     >
-    {ReactDom.renderToString(<ErrorPageWithoutStyle error={err} />)}
+      {ReactDom.renderToString(<ErrorPageWithoutStyle error={err} />)}
     </Html>,
   );
   res.status(err.status || 500);
@@ -150,5 +152,6 @@ app.use((err, req, res) => {
 });
 
 app.listen(config.port, () => {
-  console.log(`The server is running at http://localhost:${config.port}/`);
+// eslint-disable-next-line no-console
+  console.log(`The server is running at http:// localhost:${config.port}/`);
 });

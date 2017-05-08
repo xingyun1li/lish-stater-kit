@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 export default {
   path: '/',
   children: [
@@ -11,5 +12,5 @@ export default {
     route.description = route.description || '';
 
     return route;
-  }
-}
+  },
+};

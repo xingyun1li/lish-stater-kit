@@ -1,3 +1,4 @@
+/* eslint-disable react/require-default-props,react/forbid-prop-types,react/no-danger */
 import React from 'react';
 import PropTypes from 'prop-types';
 import serialize from 'serialize-javascript';
@@ -20,10 +21,10 @@ class Html extends React.Component {
     return (
       <html lang="en">
         <head>
-          <meta charSet="utf-8"/>
-          <meta httpEquiv="x-ua-compatible" content="id=edge"/>
+          <meta charSet="utf-8" />
+          <meta httpEquiv="x-ua-compatible" content="id=edge" />
           <title>{title}</title>
-          <meta name="description" content={description}/>
+          <meta name="description" content={description} />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           { styles.map(style =>
             <style
@@ -33,13 +34,13 @@ class Html extends React.Component {
             />,
           ) }
         </head>
-      <body>
-      <script dangerouslySetInnerHTML={{ __html: `window.App=${serialize(app)}` }} />
-      <div id="app" dangerouslySetInnerHTML={{__html: children}}></div>
-        {scripts && scripts.map(script => <script key={script} src={script} />)}
-      </body>
+        <body>
+          <script dangerouslySetInnerHTML={{ __html: `window.App=${serialize(app)}` }} />
+          <div id="app" dangerouslySetInnerHTML={{ __html: children }} />
+          {scripts && scripts.map(script => <script key={script} src={script} />)}
+        </body>
       </html>
-    )
+    );
   }
 }
 

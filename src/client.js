@@ -7,7 +7,7 @@ import configureStore from './store/configureStore';
 import App from './components/App';
 import history from './history';
 import router from './router';
-import { updateMeta } from './DOMUtils'
+import { updateMeta } from './DOMUtils';
 import { ErrorReporter, deepForceUpdate } from './devUtils';
 
 const context = {
@@ -19,7 +19,7 @@ const context = {
   fetch: createFetch({
     baseUrl: window.App.apiUrl,
   }),
-  store: configureStore( window.App.state, { history }),
+  store: configureStore(window.App.state, { history }),
   storeSubscription: null,
 };
 
@@ -104,7 +104,7 @@ async function onLocationChange(location, action) {
     }
 
     appInstance = ReactDOM.render(
-      <App context={ context }>
+      <App context={context}>
         { route.component }
       </App>,
       container,
@@ -129,7 +129,7 @@ async function onLocationChange(location, action) {
 }
 
 history.listen(onLocationChange);
-//noinspection JSIgnoredPromiseFromCall
+// noinspection JSIgnoredPromiseFromCall
 onLocationChange(currentLocation);
 
 // Handle errors that might happen after rendering
@@ -157,6 +157,7 @@ if (module.hot) {
       }
     }
 
+    // noinspection JSIgnoredPromiseFromCall
     onLocationChange(currentLocation);
   });
 }

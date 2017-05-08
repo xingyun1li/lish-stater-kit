@@ -22,17 +22,16 @@ class ErrorPage extends React.Component {
   };
 
   render() {
-      const { error } = this.props;
-      return (
-        <div>
-          <h1>{error.name}</h1>
-          <p>{error.message}</p>
-          <h2>{error.stack}</h2>
-        </div>
-      );
+    const { error } = this.props;
+    return (
+      <div>
+        <h1>{error.name}</h1>
+        <p>{error.message}</p>
+        <h2>{error.stack}</h2>
+      </div>
+    );
   }
 }
 
 export { ErrorPage as ErrorPageWithoutStyle };
 export default withStyles(s)(ErrorPage);
-
