@@ -29,7 +29,7 @@ const config = {
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.js?$/,
         loader: 'babel-loader',
         include: [
           path.resolve(__dirname, '../src'),
@@ -38,11 +38,27 @@ const config = {
           // https://github.com/babel/babel-loader#options
           cacheDirectory: isDebug,
 
+          // https://babeljs.io/docs/usage/options/
           babelrc: false,
           presets: [
-            'es2015',
-            'stage-0',
+            // A Babel preset that can automatically determine the Babel plugins and polyfills
+            // https://github.com/babel/babel-preset-env
+            ['env', {
+              targets: {
+                browsers: pkg.browserslist,
+              },
+              modules: false,
+              useBuiltIns: false,
+              debug: false,
+            }],
+            // Experimental ECMAScript proposals
+            // https://babeljs.io/docs/plugins/#presets-stage-x-experimental-presets-
+            'stage-2',
+            // JSX, Flow
+            // https://github.com/babel/babel/tree/master/packages/babel-preset-react
             'react',
+            // Optimize React code for the production build
+            // https://github.com/thejameskyle/babel-react-optimize
             ...isDebug ? [] : ['react-optimize'],
           ],
           plugins: [

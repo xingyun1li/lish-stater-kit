@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import queryString from 'query-string';
 import FastClick from 'fastclick';
 import createFetch from './createFetch';
+import configureStore from './store/configureStore';
 import App from './components/App';
 import history from './history';
 import router from './router';
@@ -17,7 +18,9 @@ const context = {
   },
   fetch: createFetch({
     baseUrl: window.App.apiUrl,
-  })
+  }),
+  store: configureStore( window.App.state, { history }),
+  storeSubscription: null,
 };
 
 const scrollPositionsHistory = {};
@@ -85,6 +88,7 @@ async function onLocationChange(location, action) {
     // it finds the first route that matches provided URL path string
     // and whose action method returns anything other than `undefined`.
     const route = await router.resolve({
+      ...context,
       path: location.pathname,
       query: queryString.parse(location.search),
     });
@@ -125,6 +129,7 @@ async function onLocationChange(location, action) {
 }
 
 history.listen(onLocationChange);
+//noinspection JSIgnoredPromiseFromCall
 onLocationChange(currentLocation);
 
 // Handle errors that might happen after rendering
