@@ -6,19 +6,15 @@ import pkg from '../package.json';
 
 const isDebug = !process.argv.includes('--release');
 const isVerbose = process.argv.includes('--verbose');
-const isAnalyse = process.argv.includes('--analyse') || process.argv.includes('--analyze');
-const port = parseInt(process.env.PORT || '3000', 10);
-const analyzerPort = port + 3;
+const isAnalyze = process.argv.includes('--analyze') || process.argv.includes('--analyse');
 
-let analyzerMode = 'disabled';
-if (isAnalyse) {
-  analyzerMode = 'server';
-} else if (!isDebug) {
-  analyzerMode = 'static';
-}
+//
+// Common configuration chunk to be used for both
+// client-side (client.js) and server-side (server.js) bundles
+// -----------------------------------------------------------------------------
 
 const config = {
-  context: path.resolve(__dirname, '../src'),
+  context: path.resolve(__dirname, '..'),
 
   output: {
     path: path.resolve(__dirname, '../build/public/assets'),
@@ -29,7 +25,7 @@ const config = {
   module: {
     rules: [
       {
-        test: /\.js?$/,
+        test: /\.jsx?$/,
         loader: 'babel-loader',
         include: [
           path.resolve(__dirname, '../src'),
@@ -79,6 +75,7 @@ const config = {
           },
           {
             loader: 'css-loader',
+            // css-loader?modules&localIdentName=[name]_[local]_[hash:base64:3]
             options: {
               // CSS Loader https://github.com/webpack/css-loader
               importLoaders: 1,
@@ -87,11 +84,21 @@ const config = {
               modules: true,
               localIdentName: isDebug ? '[name]-[local]-[hash:base64:5]' : '[hash:base64:5]',
               // CSS Nano http://cssnano.co/options/
-              minimize: !isDebug,
+              // minimize: true,
               discardComments: { removeAll: true },
             },
           },
+          {
+            loader: 'postcss-loader',
+            options: {
+              config: './tools/postcss.config.js',
+            },
+          },
         ],
+      },
+      {
+        test: /\.md$/,
+        loader: path.resolve(__dirname, './lib/markdown-loader.js'),
       },
       {
         test: /\.txt$/,
@@ -115,10 +122,7 @@ const config = {
     ],
   },
 
-  resolve: {
-    modules: [path.resolve(__dirname, '../src'), 'node_modules'],
-  },
-
+  // Don't attempt to continue if there are any errors.
   bail: !isDebug,
 
   cache: isDebug,
@@ -136,6 +140,10 @@ const config = {
   },
 };
 
+//
+// Configuration for the client-side bundle (client.js)
+// -----------------------------------------------------------------------------
+
 const clientConfig = {
   ...config,
 
@@ -143,7 +151,7 @@ const clientConfig = {
   target: 'web',
 
   entry: {
-    client: ['babel-polyfill', './client.js'],
+    client: ['babel-polyfill', './src/client.js'],
   },
 
   output: {
@@ -152,25 +160,33 @@ const clientConfig = {
     chunkFilename: isDebug ? '[name].chunk.js' : '[name].[chunkhash:8].chunk.js',
   },
 
-  resolve: { ...config.resolve },
-
   plugins: [
+    // Define free variables
+    // https://webpack.github.io/docs/list-of-plugins.html#defineplugin
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': isDebug ? '"development"' : '"production"',
       'process.env.BROWSER': true,
       __DEV__: isDebug,
     }),
+
+    // Emit a file with assets paths
+    // https://github.com/sporto/assets-webpack-plugin#options
     new AssetsPlugin({
       path: path.resolve(__dirname, '../build'),
       filename: 'assets.json',
       prettyPrint: true,
     }),
+
+    // Move modules that occur in multiple entry chunks to a new entry chunk (the commons chunk).
+    // http://webpack.github.io/docs/list-of-plugins.html#commonschunkplugin
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
-      minChunks: module => /node_modules/.test(module.resource)
+      minChunks: module => /node_modules/.test(module.resource),
     }),
 
     ...isDebug ? [] : [
+      // Minimize all JavaScript output of chunks
+      // https://github.com/mishoo/UglifyJS2#compressor-options
       new webpack.optimize.UglifyJsPlugin({
         sourceMap: true,
         compress: {
@@ -189,30 +205,9 @@ const clientConfig = {
       }),
     ],
 
-    new BundleAnalyzerPlugin({
-      // See above
-      analyzerMode,
-      // Host that will be used in `server` mode to start HTTP server.
-      analyzerHost: '127.0.0.1',
-      // Port that will be used in `server` mode to start HTTP server.
-      analyzerPort,
-      // Path to bundle report file that will be generated in `static` mode.
-      // Relative to bundles output directory.
-      reportFilename: path.resolve(__dirname, '../report.html'),
-      // Automatically open report in default browser
-      openAnalyzer: true,
-      // If `true`, Webpack Stats JSON file will be generated in bundles output directory
-      generateStatsFile: !isDebug,
-      // Name of Webpack Stats JSON file that will be generated if `generateStatsFile` is `true`.
-      // Relative to bundles output directory.
-      statsFilename: path.resolve(__dirname, '../stats.json'),
-      // Options for `stats.toJson()` method.
-      // You can exclude sources of your modules from stats file with `source: false` option.
-      // See more options here: https://github.com/webpack/webpack/blob/webpack-1/lib/Stats.js#L21
-      statsOptions: null,
-      // Log level. Can be 'info', 'warn', 'error' or 'silent'.
-      logLevel: 'info',
-    }),
+    // Webpack Bundle Analyzer
+    // https://github.com/th0r/webpack-bundle-analyzer
+    ...isAnalyze ? [new BundleAnalyzerPlugin()] : [],
   ],
 
   // Choose a developer tool to enhance debugging
@@ -241,7 +236,7 @@ const serverConfig = {
   target: 'node',
 
   entry: {
-    server: ['babel-polyfill', './server.js'],
+    server: ['babel-polyfill', './src/server.js'],
   },
 
   output: {
@@ -269,8 +264,6 @@ const serverConfig = {
       },
     })),
   },
-
-  resolve: { ...config.resolve },
 
   externals: [
     /^\.\/assets\.json$/,

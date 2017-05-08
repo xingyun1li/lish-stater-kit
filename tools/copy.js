@@ -4,6 +4,10 @@ import { writeFile, copyFile, makeDir, copyDir, cleanDir } from './lib/fs';
 import pkg from '../package.json';
 import { format } from './run';
 
+/**
+ * Copies static files such as robots.txt, favicon.ico to the
+ * output (build) folder.
+ */
 async function copy() {
   await makeDir('build');
   await Promise.all([
@@ -15,13 +19,14 @@ async function copy() {
         start: 'node server.js',
       },
     }, null, 2)),
-    copyDir('public', 'build/public')
+    copyFile('LICENSE.txt', 'build/LICENSE.txt'),
+    copyDir('public', 'build/public'),
   ]);
 
   if (process.argv.includes('--watch')) {
     const watcher = chokidar.watch([
       'public/**/*',
-    ], {ignoreInitial: true });
+    ], { ignoreInitial: true });
 
     watcher.on('all', async (event, filePath) => {
       const start = new Date();
@@ -35,7 +40,7 @@ async function copy() {
           break;
         case 'unlink':
         case 'unlinkDir':
-          cleanDir(dist, { nosort: true, dot: true});
+          cleanDir(dist, { nosort: true, dot: true });
           break;
         default:
           return;
