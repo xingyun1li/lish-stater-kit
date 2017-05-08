@@ -1,5 +1,6 @@
 import React from 'react';
-import Home from './home';
+import Home from './Home';
+import Layout from '../../components/Layout';
 
 export default {
   path: '/',
@@ -7,7 +8,7 @@ export default {
   action() {
     return{
       title: 'home',
-      component: <Home/>,
+      component: <Layout><Home/></Layout>,
     };
   },
 };
