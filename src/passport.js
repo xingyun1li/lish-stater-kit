@@ -1,7 +1,7 @@
 import passport from 'passport';
 import { Strategy as GithubStrategy} from 'passport-github2';
 
-import { auth as config } from '../config';
+import { auth as config } from './config';
 
 //TODO 实现自己的passport
 //Sign in with github

@@ -2,36 +2,24 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import queryString from 'query-string';
 import FastClick from 'fastclick';
+import createFetch from './createFetch';
+import App from './components/App';
 import history from './history';
 import router from './router';
 import { updateMeta } from './DOMUtils'
 import { ErrorReporter, deepForceUpdate } from './devUtils';
 
+const context = {
+  insertCss: (...styles) => {
+    // eslint-disable-next-line no-underscore-dangle
+    const removeCss = styles.map(x => x._insertCss());
+    return () => { removeCss.forEach(f => f()); };
+  },
+  fetch: createFetch({
+    baseUrl: window.App.apiUrl,
+  })
+};
 
-/* eslint-disable global-require */
-
-// Global (context) variables that can be easily accessed from any React component
-// https://facebook.github.io/react/docs/context.html
-// const context = {
-//   // Enables critical path CSS rendering
-//   // https://github.com/kriasoft/isomorphic-style-loader
-//   insertCss: (...styles) => {
-//     // eslint-disable-next-line no-underscore-dangle
-//     const removeCss = styles.map(x => x._insertCss());
-//     return () => { removeCss.forEach(f => f()); };
-//   },
-//   // Universal HTTP client
-//   fetch: createFetch({
-//     baseUrl: window.App.apiUrl,
-//   }),
-//   // Initialize a new Redux store
-//   // http://redux.js.org/docs/basics/UsageWithReact.html
-//   store: configureStore(window.App.state, { history }),
-//   storeSubscription: null,
-// };
-
-// Switch off the native scroll restoration behavior and handle it manually
-// https://developers.google.com/web/updates/2015/09/history-api-scroll-restoration
 const scrollPositionsHistory = {};
 if (window.history && 'scrollRestoration' in window.history) {
   window.history.scrollRestoration = 'manual';
@@ -112,7 +100,9 @@ async function onLocationChange(location, action) {
     }
 
     appInstance = ReactDOM.render(
-      route.component,
+      <App context={ context }>
+        { route.component }
+      </App>,
       container,
       () => onRenderComplete(route, location),
     );

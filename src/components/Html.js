@@ -1,16 +1,22 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
+import serialize from 'serialize-javascript';
 
 class Html extends React.Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
-    style: PropTypes.string,
+    styles: PropTypes.arrayOf(PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      cssText: PropTypes.string.isRequired,
+    }).isRequired),
     scripts: PropTypes.arrayOf(PropTypes.string.isRequired),
+    app: PropTypes.object,
     children: PropTypes.string,
   };
 
   render() {
-    const { title, description, style, scripts, children } = this.props;
+    const { title, description, styles, scripts, app, children } = this.props;
     return (
       <html lang="en">
         <head>
@@ -19,10 +25,17 @@ class Html extends React.Component {
           <title>{title}</title>
           <meta name="description" content={description}/>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          {style && <style id="css" dangerouslySetInnerHTML={{ __html: style }}/>}
+          { styles.map(style =>
+            <style
+              key={style.id}
+              id={style.id}
+              dangerouslySetInnerHTML={{ __html: style.cssText }}
+            />,
+          ) }
         </head>
       <body>
-        <div id="app" dangerouslySetInnerHTML={{__html: children}}></div>
+      <script dangerouslySetInnerHTML={{ __html: `window.App=${serialize(app)}` }} />
+      <div id="app" dangerouslySetInnerHTML={{__html: children}}></div>
         {scripts && scripts.map(script => <script key={script} src={script} />)}
       </body>
       </html>

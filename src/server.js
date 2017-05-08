@@ -11,11 +11,13 @@ import PrettyError from 'pretty-error';
 
 import router from './router';
 import ErrorPageWithoutStyle from './routes/error/ErrorPage';
+import createFetch from './createFetch';
 
-import passport from './core/passport';
-import { port, auth } from './config';
+import passport from './passport';
+import config from './config';
 
 import Html from './components/Html';
+import App from './components/App';
 import assets from './assets.json';
 
 const app = express();
@@ -30,9 +32,8 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({entended: true}));
 app.use(bodyParser.json());
 
-//Authentication
 app.use(expressJwt({
-  secret: auth.jwt.secret,
+  secret: config.auth.jwt.secret,
   credentialsRequired: false,
   getToken: req => req.cookies.id_token
 }));
@@ -53,58 +54,65 @@ app.get('/auth/github/callback',
   passport.authenticate('github', { failureRedirect: '/', session: false}),
   (req, res) => {
     const expiresIn = 60 * 60 * 24 * 30; //30 days
-    const token = jwt.sign(req.user, auth.jwt.secret, { expiresIn });
+    const token = jwt.sign(req.user, config.auth.jwt.secret, { expiresIn });
     res.cookie('id_token', token, { maxAge: 1000 * expiresIn, httpOnly: true});
     res.redirect('/');
   }
 );
 
-// app.get('/', (req, res) => {
-//   const data = {};
-//   data.title = 'title';
-//   data.description = 'des';
-//   data.scripts = [
-//     assets.vendor.js,
-//     assets.client.js
-//   ];
-//
-//   const html = ReactDom.renderToStaticMarkup(<Html {...data} />);
-//   res.status(200);
-//   res.send(`<!doctype html>${html}`);
-// });
-
 app.get('*', async (req, res, next) => {
-  const route = await router.resolve({
-    path: req.path,
-    query: req.query,
-  });
-  if (route.redirect) {
-    res.redirect(route.status || 302, route.redirect);
-    return;
+  try {
+    const css = new Set();
+    const fetch = createFetch({
+      baseUrl: config.api.serverUrl,
+      cookie: req.header.cookie,
+    });
+    const context = {
+      insertCss: (...styles) => {
+        // eslint-disable-next-line no-underscore-dangle
+        styles.forEach(style => css.add(style._getCss()));
+      },
+      fetch,
+    };
+    const route = await router.resolve({
+      path: req.path,
+      query: req.query,
+    });
+    if (route.redirect) {
+      res.redirect(route.status || 302, route.redirect);
+      return;
+    }
+    const data = {...route};
+    data.children = ReactDom.renderToString(
+      <App context={ context }>
+        { route.component }
+      </App>
+    );
+    data.app = {
+      apiUrl: config.api.clientUrl,
+    };
+    data.description = 'des';
+    data.scripts = [
+      assets.vendor.js,
+      assets.client.js
+    ];
+    data.styles = [
+      { id: 'css', cssText: [...css].join('') },
+    ];
+    const html = ReactDom.renderToStaticMarkup(<Html {...data} />);
+    res.status(200);
+    res.send(`<!doctype html>${html}`);
+  } catch (err) {
+    next(err);
   }
-  const data = {...route};
-  data.children = ReactDom.renderToString(
-    route.component
-  );
-  data.description = 'des';
-  data.scripts = [
-    assets.vendor.js,
-    assets.client.js
-  ];
-
-  const html = ReactDom.renderToStaticMarkup(<Html {...data} />);
-  res.status(200);
-  res.send(`<!doctype html>${html}`);
 });
 
-//
-// Error handling
-// -----------------------------------------------------------------------------
+//错误处理
 const pe = new PrettyError();
 pe.skipNodeFiles();
 pe.skipPackage('express');
 
-app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
+app.use((err, req, res) => {
   console.error(pe.render(err));
   const html = ReactDom.renderToStaticMarkup(
     <Html
@@ -118,6 +126,6 @@ app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   res.send(`<!doctype html>${html}`);
 });
 
-app.listen(port, () => {
-  console.log(`The server is running at http://localhost:${port}/`);
+app.listen(config.port, () => {
+  console.log(`The server is running at http://localhost:${config.port}/`);
 });
