@@ -3,5 +3,5 @@ export default function createHelpers({ fetch, history }) {
     fetch,
     history,
     // TODO: Graphql....
-  }
+  };
 }

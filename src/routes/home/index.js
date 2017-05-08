@@ -6,9 +6,9 @@ export default {
   path: '/',
 
   action() {
-    return{
+    return {
       title: 'home',
-      component: <Layout><Home/></Layout>,
+      component: <Layout><Home /></Layout>,
     };
   },
 };

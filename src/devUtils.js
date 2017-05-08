@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 if (module.hot || __DEV__) {
   module.exports = {
     // The red box (aka red screen of death) component to display your errors

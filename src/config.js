@@ -2,7 +2,7 @@ if (process.env.BROWSER) {
   throw new Error('Do not import `config.js` from inside the client-side code.');
 }
 
-const config =  {
+const config = {
   port: process.env.PORT || 3000,
   api: {
     // API URL to be used in the client-side code
@@ -12,23 +12,13 @@ const config =  {
   },
   auth: {
     jwt: {
-      secret: process.env.JWT_SECRET || 'Lish Starter Kit'
+      secret: process.env.JWT_SECRET || 'Lish Starter Kit',
     },
     github: {
       id: process.env.GITHUB_CLIENT_ID || '26b07d39379cfdf7b574',
-      secret: process.env.GITHUB_CLIENT_SECRET || '8a3a63f843392fceee711c0af0c457295780e56e'
-    }
+      secret: process.env.GITHUB_CLIENT_SECRET || '8a3a63f843392fceee711c0af0c457295780e56e',
+    },
   },
-};
-
-export const auth = {
-  jwt: {
-    secret: process.env.JWT_SECRET || 'Lish Starter Kit'
-  },
-  github: {
-    id: process.env.GITHUB_CLIENT_ID || '26b07d39379cfdf7b574',
-    secret: process.env.GITHUB_CLIENT_SECRET || '8a3a63f843392fceee711c0af0c457295780e56e'
-  }
 };
 
 export default config;
