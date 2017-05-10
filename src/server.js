@@ -13,7 +13,7 @@ import router from './router';
 import { ErrorPageWithoutStyle } from './routes/error/ErrorPage';
 import createFetch from './createFetch';
 import configureStore from './store/configureStore';
-import { setRuntimeVariable } from './actions/runtime';
+import setRuntimeVariable from './actions/runtime';
 
 import passport from './passport';
 import config from './config';

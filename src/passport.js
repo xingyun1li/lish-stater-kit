@@ -1,13 +1,13 @@
 import passport from 'passport';
 import { Strategy as GithubStrategy } from 'passport-github2';
 
-import { auth as config } from './config';
+import config from './config';
 
 // TODO 实现自己的passport
 // Sign in with github
 passport.use(new GithubStrategy({
-  clientID: config.github.id,
-  clientSecret: config.github.secret,
+  clientID: config.auth.github.id,
+  clientSecret: config.auth.github.secret,
   callbackURL: '/auth/github/callback',
 }, (accessToken, refreshToken, profile, done) => {
   const user = {

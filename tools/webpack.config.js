@@ -84,7 +84,7 @@ const config = {
               modules: true,
               localIdentName: isDebug ? '[name]-[local]-[hash:base64:5]' : '[hash:base64:5]',
               // CSS Nano http://cssnano.co/options/
-              // minimize: true,
+              minimize: true,
               discardComments: { removeAll: true },
             },
           },
