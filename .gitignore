@@ -4,3 +4,5 @@ build/
 index.html
 report.html
 stats.json
+.DS_Store
+yarn.lock
