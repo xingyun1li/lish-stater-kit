@@ -42,6 +42,8 @@ app.use(expressJwt({
 }));
 app.use(passport.initialize());
 
+app.set('trust proxy', true);
+
 app.get('/login/github', passport.authenticate('github', { scrope: ['user:email'], session: false }));
 
 app.get('/welcome', (req, res) => {
@@ -153,5 +155,5 @@ app.use((err, req, res) => {
 
 app.listen(config.port, () => {
 // eslint-disable-next-line no-console
-  console.log(`The server is running at http:// localhost:${config.port}/`);
+  console.log(`The server is running at http://localhost:${config.port}/`);
 });
