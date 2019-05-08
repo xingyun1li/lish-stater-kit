@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { StylesProvider } from '@material-ui/styles';
 import { Provider as ReduxProvider } from 'react-redux';
 
 const ContextType = {
@@ -27,7 +28,11 @@ class App extends React.PureComponent {
   }
 
   render() {
-    return React.Children.only(this.props.children);
+    return (
+      <StylesProvider>
+        { React.Children.only(this.props.children) }
+      </StylesProvider>
+    );
   }
 
 }

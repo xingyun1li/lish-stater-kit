@@ -1,3 +1,4 @@
-.red {
-  color: red;
+.content {
+  flex-grow: 1;
+  padding: 60px;
 }

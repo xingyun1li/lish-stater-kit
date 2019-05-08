@@ -8,7 +8,7 @@ export default {
   action() {
     return {
       title: 'home',
-      component: <Layout><Home /></Layout>,
+      component: <Layout title="首页"><Home /></Layout>,
     };
   },
 };
