@@ -37,7 +37,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Spider = ({ isSpiderRunning, runSpider }) => {
+const Spider = ({ isSpiderRunning }) => {
   const classes = useStyles();
 
   return (
@@ -53,7 +53,7 @@ const Spider = ({ isSpiderRunning, runSpider }) => {
             <Button variant="contained" color="primary" disabled className={classes.button}>
               运行中...
             </Button> :
-            <Button variant="contained" color="primary" onClick={runSpider} className={classes.button}>
+            <Button variant="contained" color="primary" className={classes.button}>
               启动
             </Button>
           }
@@ -65,17 +65,17 @@ const Spider = ({ isSpiderRunning, runSpider }) => {
 
 Spider.propTypes = {
   isSpiderRunning: PropTypes.bool.isRequired,
-  runSpider: PropTypes.func.isRequired,
+  // runSpider: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
   isSpiderRunning: state.spider.isSpiderRunning,
 });
 
-const mapDispatchToProps = dispatch => ({
-  runSpider: () => {
-    dispatch(setSpiderRunning({ isSpiderRunning: true }));
-  },
-});
+// const mapDispatchToProps = dispatch => ({
+//   runSpider: () => {
+//     dispatch(setSpiderRunning({ isSpiderRunning: true }));
+//   },
+// });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Spider);
+export default connect(mapStateToProps)(Spider);

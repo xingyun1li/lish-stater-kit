@@ -8,7 +8,7 @@ import ReactDom from 'react-dom/server';
 import jwt from 'jsonwebtoken';
 import expressJwt from 'express-jwt';
 import PrettyError from 'pretty-error';
-
+import { redisGet } from './redisConn';
 import router from './router';
 import { ErrorPageWithoutStyle } from './routes/error/ErrorPage';
 import createFetch from './createFetch';
@@ -83,13 +83,21 @@ app.get('*', async (req, res, next) => {
       //  I should not use `history` on server.. but how I do redirection? follow universal-router
     });
 
+    const spiderStatus = await redisGet('spider:status');
+
     store.dispatch(setRuntimeVariable({
       name: 'initialNow',
       value: Date.now(),
     }));
-    store.dispatch(setSpiderRunning({
-      isSpiderRunning: false,
-    }));
+    if (!spiderStatus || spiderStatus === 'close') {
+      store.dispatch(setSpiderRunning({
+        isSpiderRunning: false,
+      }));
+    } else {
+      store.dispatch(setSpiderRunning({
+        isSpiderRunning: true,
+      }))
+    }
 
     const context = {
       insertCss: (...styles) => {
