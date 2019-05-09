@@ -18,7 +18,12 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
+import DashboardIcon from '@material-ui/icons/Dashboard';
 import NoSsr from '@material-ui/core/NoSsr';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
+
+import Link from '../Link';
+import s from './Layout.css';
 
 const drawerWidth = 240;
 
@@ -145,12 +150,30 @@ function Layout({ title, children }) {
           </div>
           <Divider />
           <List>
-            {['知识共享', '程序控制', '查询服务', '更多功能'].map((text, index) => (
-              <ListItem button key={text}>
-                <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                <ListItemText primary={text} />
+            <Link to="/" className={s.link}>
+              <ListItem button key="知识共享">
+                <ListItemIcon><DashboardIcon /></ListItemIcon>
+                <ListItemText primary="知识共享" />
               </ListItem>
-            ))}
+            </Link>
+            <Link to="/chaxun" className={s.link}>
+              <ListItem button key="查询服务">
+                <ListItemIcon><InboxIcon /></ListItemIcon>
+                <ListItemText primary="查询服务" />
+              </ListItem>
+            </Link>
+            <Link to="/program" className={s.link}>
+              <ListItem button key="程序控制">
+                <ListItemIcon><MailIcon /></ListItemIcon>
+                <ListItemText primary="程序控制" />
+              </ListItem>
+            </Link>
+            <Link to="/more" className={s.link}>
+              <ListItem button key="更多功能">
+                <ListItemIcon><MailIcon /></ListItemIcon>
+                <ListItemText primary="更多功能" />
+              </ListItem>
+            </Link>
           </List>
         </Drawer>
       </NoSsr>
@@ -171,4 +194,4 @@ Layout.defaultProps = {
 };
 
 
-export default Layout;
+export default withStyles(s)(Layout);

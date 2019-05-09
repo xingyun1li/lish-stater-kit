@@ -1,15 +1,12 @@
 import React from 'react';
-import {makeStyles, useTheme} from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
+import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import CardHeader from '@material-ui/core/CardHeader';
-import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
-import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import SkipNextIcon from '@material-ui/icons/SkipNext';
-import Avatar from '@material-ui/core/Avatar';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Button from '@material-ui/core/Button';
+import setSpiderRunning from '../../../actions/spider';
+import { connect } from 'react-redux';
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -18,6 +15,9 @@ const useStyles = makeStyles(theme => ({
   details: {
     display: 'flex',
     flexDirection: 'column',
+  },
+  button: {
+    margin: theme.spacing(1),
   },
   content: {
     flex: '1 0 auto',
@@ -37,29 +37,45 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function Spider() {
+const Spider = ({ isSpiderRunning, runSpider }) => {
   const classes = useStyles();
-  const theme = useTheme();
 
   return (
     <Card className={classes.card}>
       <div className={classes.details}>
         <CardContent className={classes.content}>
           <Typography component="h5" variant="h5">
-            爬虫控制
-          </Typography>
-          <Typography variant="subtitle1" color="textSecondary">
-            李松鹤
+            Redmine爬虫
           </Typography>
         </CardContent>
         <div className={classes.controls}>
-          <IconButton aria-label="Play/pause">
-            <PlayArrowIcon className={classes.playIcon} />
-          </IconButton>
+          {isSpiderRunning ?
+            <Button variant="contained" color="primary" disabled className={classes.button}>
+              运行中...
+            </Button> :
+            <Button variant="contained" color="primary" onClick={runSpider} className={classes.button}>
+              启动
+            </Button>
+          }
         </div>
       </div>
     </Card>
   );
-}
+};
 
-export default Spider;
+Spider.propTypes = {
+  isSpiderRunning: PropTypes.bool.isRequired,
+  runSpider: PropTypes.func.isRequired,
+};
+
+const mapStateToProps = state => ({
+  isSpiderRunning: state.spider.isSpiderRunning,
+});
+
+const mapDispatchToProps = dispatch => ({
+  runSpider: () => {
+    dispatch(setSpiderRunning({ isSpiderRunning: true }));
+  },
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Spider);

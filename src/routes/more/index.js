@@ -1,16 +1,16 @@
 import React from 'react';
-import Home from './Home';
+import More from './More';
 import Layout from '../../components/Layout';
 
-const title = '首页';
+const title = '更多功能';
 
 export default {
-  path: '/',
+  path: '/more',
 
   action() {
     return {
       title,
-      component: <Layout title={title}><Home /></Layout>,
+      component: <Layout title={title}><More /></Layout>,
     };
   },
 };

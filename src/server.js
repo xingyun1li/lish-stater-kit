@@ -14,6 +14,7 @@ import { ErrorPageWithoutStyle } from './routes/error/ErrorPage';
 import createFetch from './createFetch';
 import configureStore from './store/configureStore';
 import setRuntimeVariable from './actions/runtime';
+import setSpiderRunning from './actions/spider';
 
 import passport from './passport';
 import config from './config';
@@ -85,6 +86,9 @@ app.get('*', async (req, res, next) => {
     store.dispatch(setRuntimeVariable({
       name: 'initialNow',
       value: Date.now(),
+    }));
+    store.dispatch(setSpiderRunning({
+      isSpiderRunning: false,
     }));
 
     const context = {
