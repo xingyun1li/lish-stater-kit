@@ -96,7 +96,7 @@ app.get('*', async (req, res, next) => {
     } else {
       store.dispatch(setSpiderRunning({
         isSpiderRunning: true,
-      }))
+      }));
     }
 
     const context = {
