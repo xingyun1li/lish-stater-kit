@@ -10,6 +10,10 @@ const config = {
     // API URL to be used in the server-side code
     serverUrl: process.env.API_SERVER_URL || `http://localhost:${process.env.PORT || 3000}`,
   },
+  redisConf: {
+    host: 'localhost',
+    port: 6379,
+  },
   auth: {
     jwt: {
       secret: process.env.JWT_SECRET || 'Lish Starter Kit',

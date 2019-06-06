@@ -2,24 +2,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import Spider from '../../components/Widgets/Spider';
 import s from './Home.css';
+
 
 class Home extends React.Component {
   static propTypes = {
-    user: PropTypes.object, // eslint-disable-line
+    fetch: PropTypes.func.isRequired,
   };
 
   render() {
-    const { user } = this.props;
-    if (user) {
-      return (
-        <h2 className={s.red}>user.name</h2>
-      );
-    } else {
-      return (
-        <h2>No user!</h2>
-      );
-    }
+    const { fetch } = this.props;
+    return (
+      <Spider fetch={fetch} />
+    );
   }
 }
 

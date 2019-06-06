@@ -1,3 +1,12 @@
+/**
+ * React Starter Kit (https://www.reactstarterkit.com/)
+ *
+ * Copyright © 2014-present Kriasoft, LLC. All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE.txt file in the root directory of this source tree.
+ */
+
 import path from 'path';
 import fetch from 'node-fetch';
 import { spawn } from './lib/cp';
@@ -70,7 +79,7 @@ async function deploy() {
   // generates optimized and minimized bundles
   process.argv.push('--release');
   if (remote.static) process.argv.push('--static');
-  await run(require('./build').default);
+  await run(require('./build').default); // eslint-disable-line global-require
   if (process.argv.includes('--static')) {
     await cleanDir('build/*', {
       nosort: true,
@@ -91,7 +100,7 @@ async function deploy() {
 
   // Check if the site was successfully deployed
   const response = await fetch(remote.website);
-  console.log(`${remote.website} => ${response.status} ${response.statusText}`);
+  console.info(`${remote.website} => ${response.status} ${response.statusText}`);
 }
 
 export default deploy;

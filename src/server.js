@@ -8,18 +8,20 @@ import ReactDom from 'react-dom/server';
 import jwt from 'jsonwebtoken';
 import expressJwt from 'express-jwt';
 import PrettyError from 'pretty-error';
-
+import { redisGet } from './redisConn';
 import router from './router';
 import { ErrorPageWithoutStyle } from './routes/error/ErrorPage';
 import createFetch from './createFetch';
 import configureStore from './store/configureStore';
 import setRuntimeVariable from './actions/runtime';
+import setSpiderRunning from './actions/spider';
 
 import passport from './passport';
 import config from './config';
 
 import Html from './components/Html';
 import App from './components/App';
+import SpiderRoute from './api/spider';
 // eslint-disable-next-line import/no-unresolved
 import assets from './assets.json';
 
@@ -41,6 +43,10 @@ app.use(expressJwt({
   getToken: req => req.cookies.id_token,
 }));
 app.use(passport.initialize());
+
+app.use('/api/spider', SpiderRoute);
+
+app.set('trust proxy', true);
 
 app.get('/login/github', passport.authenticate('github', { scrope: ['user:email'], session: false }));
 
@@ -80,10 +86,22 @@ app.get('*', async (req, res, next) => {
       //  I should not use `history` on server.. but how I do redirection? follow universal-router
     });
 
+    const isSpiderRunning = await redisGet('spider:isRunning');
+    // const spiderStatus = null;
+
     store.dispatch(setRuntimeVariable({
       name: 'initialNow',
       value: Date.now(),
     }));
+    if (isSpiderRunning === 'false') {
+      store.dispatch(setSpiderRunning({
+        isSpiderRunning: false,
+      }));
+    } else {
+      store.dispatch(setSpiderRunning({
+        isSpiderRunning: true,
+      }));
+    }
 
     const context = {
       insertCss: (...styles) => {
@@ -153,5 +171,5 @@ app.use((err, req, res) => {
 
 app.listen(config.port, () => {
 // eslint-disable-next-line no-console
-  console.log(`The server is running at http:// localhost:${config.port}/`);
+  console.log(`The server is running at http://localhost:${config.port}/`);
 });

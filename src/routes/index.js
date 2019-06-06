@@ -3,6 +3,9 @@ export default {
   path: '/',
   children: [
     require('./home').default,
+    require('./program').default,
+    require('./chaxun').default,
+    require('./more').default,
     require('./notFound').default,
   ],
   async action({ next }) {

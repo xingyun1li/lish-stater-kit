@@ -19,7 +19,7 @@ function createFetch({ baseUrl, cookie } /* : Options */) {
     },
   };
 
-  return (url, options) => ((url.startsWith('/graphql') || url.startsWith('/api')) ?
+  return (url, options) => ((url.startsWith('/graphql')) ?
     fetch(`${baseUrl}${url}`, {
       ...defaults,
       ...options,

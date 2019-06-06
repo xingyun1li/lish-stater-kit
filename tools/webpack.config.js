@@ -1,3 +1,12 @@
+/**
+ * React Starter Kit (https://www.reactstarterkit.com/)
+ *
+ * Copyright © 2014-present Kriasoft, LLC. All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE.txt file in the root directory of this source tree.
+ */
+
 import path from 'path';
 import webpack from 'webpack';
 import AssetsPlugin from 'assets-webpack-plugin';
@@ -75,7 +84,6 @@ const config = {
           },
           {
             loader: 'css-loader',
-            // css-loader?modules&localIdentName=[name]_[local]_[hash:base64:3]
             options: {
               // CSS Loader https://github.com/webpack/css-loader
               importLoaders: 1,
@@ -84,7 +92,7 @@ const config = {
               modules: true,
               localIdentName: isDebug ? '[name]-[local]-[hash:base64:5]' : '[hash:base64:5]',
               // CSS Nano http://cssnano.co/options/
-              minimize: true,
+              minimize: !isDebug,
               discardComments: { removeAll: true },
             },
           },
@@ -119,6 +127,18 @@ const config = {
           limit: 10000,
         },
       },
+
+      // Exclude dev modules from production build
+      ...isDebug ? [] : [
+        {
+          test: path.resolve(__dirname, '../node_modules/redbox-react/lib/index.js'),
+          use: 'null-loader',
+        },
+        {
+          test: path.resolve(__dirname, '../node_modules/react-deep-force-update/lib/index.js'),
+          use: 'null-loader',
+        },
+      ],
     ],
   },
 

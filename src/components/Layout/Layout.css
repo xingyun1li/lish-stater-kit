@@ -1,3 +1,14 @@
-.red {
-  color: red;
+.link {
+  display: block;
+  text-decoration: none;
+}
+
+.link,
+.link:active,
+.link:visited {
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.link:hover {
+  color: rgba(0, 0, 0, 0.87);
 }
