@@ -27,6 +27,8 @@
     "body-parser": "^1.17.1",
     "clsx": "^1.0.4",
     "cookie-parser": "^1.4.3",
+    "echarts": "^4.2.1",
+    "echarts-for-react": "^2.0.15-beta.0",
     "express": "^4.14.0",
     "express-jwt": "^5.1.0",
     "fastclick": "^1.0.6",

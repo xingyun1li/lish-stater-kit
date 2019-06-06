@@ -21,6 +21,7 @@ import config from './config';
 
 import Html from './components/Html';
 import App from './components/App';
+import SpiderRoute from './api/spider';
 // eslint-disable-next-line import/no-unresolved
 import assets from './assets.json';
 
@@ -42,6 +43,8 @@ app.use(expressJwt({
   getToken: req => req.cookies.id_token,
 }));
 app.use(passport.initialize());
+
+app.use('/api/spider', SpiderRoute);
 
 app.set('trust proxy', true);
 
@@ -83,13 +86,14 @@ app.get('*', async (req, res, next) => {
       //  I should not use `history` on server.. but how I do redirection? follow universal-router
     });
 
-    const spiderStatus = await redisGet('spider:status');
+    const isSpiderRunning = await redisGet('spider:isRunning');
+    // const spiderStatus = null;
 
     store.dispatch(setRuntimeVariable({
       name: 'initialNow',
       value: Date.now(),
     }));
-    if (!spiderStatus || spiderStatus === 'close') {
+    if (isSpiderRunning === 'false') {
       store.dispatch(setSpiderRunning({
         isSpiderRunning: false,
       }));

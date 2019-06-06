@@ -7,10 +7,10 @@ const title = '首页';
 export default {
   path: '/',
 
-  action() {
+  action({ fetch }) {
     return {
       title,
-      component: <Layout title={title}><Home /></Layout>,
+      component: <Layout title={title}><Home fetch={fetch} /></Layout>,
     };
   },
 };

@@ -5,8 +5,8 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import setSpiderRunning from '../../../actions/spider';
 import { connect } from 'react-redux';
+import setSpiderRunning from '../../../actions/spider';
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -37,9 +37,8 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Spider = ({ isSpiderRunning }) => {
+const Spider = ({ isSpiderRunning, runSpider, stopSpider }) => {
   const classes = useStyles();
-
   return (
     <Card className={classes.card}>
       <div className={classes.details}>
@@ -53,8 +52,17 @@ const Spider = ({ isSpiderRunning }) => {
             <Button variant="contained" color="primary" disabled className={classes.button}>
               运行中...
             </Button> :
-            <Button variant="contained" color="primary" className={classes.button}>
+            <Button variant="contained" color="primary" onClick={runSpider} className={classes.button}>
               启动
+            </Button>
+          }
+
+          {isSpiderRunning ?
+            <Button variant="contained" color="secondary" onClick={stopSpider} className={classes.button}>
+              终止
+            </Button> :
+            <Button variant="contained" color="primary" disabled className={classes.button}>
+              终止
             </Button>
           }
         </div>
@@ -65,17 +73,33 @@ const Spider = ({ isSpiderRunning }) => {
 
 Spider.propTypes = {
   isSpiderRunning: PropTypes.bool.isRequired,
-  // runSpider: PropTypes.func.isRequired,
+  runSpider: PropTypes.func.isRequired,
+  stopSpider: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
   isSpiderRunning: state.spider.isSpiderRunning,
 });
 
-// const mapDispatchToProps = dispatch => ({
-//   runSpider: () => {
-//     dispatch(setSpiderRunning({ isSpiderRunning: true }));
-//   },
-// });
+const mapDispatchToProps = (dispatch, { fetch }) => ({
+  runSpider: async () => {
+    const resp = await fetch('/api/spider/start');
+    const { result } = await resp.json();
+    if (result) {
+      dispatch(setSpiderRunning({ isSpiderRunning: true }));
+    } else {
+      dispatch(setSpiderRunning({ isSpiderRunning: false }));
+    }
+  },
+  stopSpider: async () => {
+    const resp = await fetch('/api/spider/stop');
+    const { result } = await resp.json();
+    if (result) {
+      dispatch(setSpiderRunning({ isSpiderRunning: false }));
+    } else {
+      dispatch(setSpiderRunning({ isSpiderRunning: true }));
+    }
+  },
+});
 
-export default connect(mapStateToProps)(Spider);
+export default connect(mapStateToProps, mapDispatchToProps)(Spider);
