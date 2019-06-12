@@ -23,6 +23,7 @@
   "dependencies": {
     "@material-ui/core": "next",
     "@material-ui/icons": "next",
+    "amqplib": "^0.5.3",
     "babel-polyfill": "^6.23.0",
     "body-parser": "^1.17.1",
     "clsx": "^1.0.4",
@@ -46,6 +47,7 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-redux": "^5.0.4",
+    "react-virtualized": "^9.21.1",
     "redis": "^2.8.0",
     "redux": "^3.6.0",
     "redux-logger": "^3.0.1",

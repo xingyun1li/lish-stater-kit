@@ -1,16 +1,31 @@
-/* eslint-disable no-trailing-spaces */
-import React from 'react';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+/* eslint-disable no-trailing-spaces,semi,no-console */
+import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import XuqiuNum from '../../components/Widgets/XuqiuNum';
-import s from './Chaxun.css';
+import { setXuqiuAll, setXuqiuCurrent } from '../../actions/xuqiu';
 
 
-class Chaxun extends React.Component {
-  render() {
-    return (
-      <XuqiuNum />
-    );
-  }
-}
+const Chaxun = ({ fetch, dispatch }) => {
+  useEffect(() => {
+    async function fetchData() {
+      const repsAll = await fetch('/api/xuqiu/all');
+      const { all } = await repsAll.json();
+      dispatch(setXuqiuAll({ xuqiuAll: all }));
+      const repsCurrent = await fetch('/api/xuqiu/current');
+      const { current } = await repsCurrent.json();
+      dispatch(setXuqiuCurrent(({ xuqiuCurrent: current })))
+    }
+    fetchData();
+  });
+  return (
+    <XuqiuNum />
+  );
+};
 
-export default withStyles(s)(Chaxun);
+Chaxun.propTypes = {
+  fetch: PropTypes.func.isRequired,
+  dispatch: PropTypes.func.isRequired,
+};
+
+export default connect()(Chaxun);

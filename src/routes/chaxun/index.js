@@ -5,10 +5,10 @@ import Layout from '../../components/Layout';
 export default {
   path: '/chaxun',
 
-  action() {
+  async action({ fetch }) {
     return {
       title: '查询服务',
-      component: <Layout title="查询服务"><Chaxun /></Layout>,
+      component: <Layout title="查询服务"><Chaxun fetch={fetch} /></Layout>,
     };
   },
 };
