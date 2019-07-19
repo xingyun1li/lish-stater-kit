@@ -14,6 +14,16 @@ const config = {
     host: 'localhost',
     port: 6379,
   },
+  mysqlConf: {
+    host: 'localhost',
+    user: 'lish',
+    password: 'xingyun1li',
+    database: 'redmine',
+    connectionLimit: 1000,
+    connectTimeout: 60 * 60 * 1000,
+    acquireTimeout: 60 * 60 * 1000,
+    timeout: 60 * 60 * 1000,
+  },
   auth: {
     jwt: {
       secret: process.env.JWT_SECRET || 'Lish Starter Kit',

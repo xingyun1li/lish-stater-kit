@@ -5,7 +5,6 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import React from 'react';
 import ReactDom from 'react-dom/server';
-import jwt from 'jsonwebtoken';
 import expressJwt from 'express-jwt';
 import PrettyError from 'pretty-error';
 import { redisGet } from './redisConn';
@@ -22,6 +21,7 @@ import config from './config';
 import Html from './components/Html';
 import App from './components/App';
 import SpiderRoute from './api/spider';
+import XuqiuRoute from './api/xuqiu';
 // eslint-disable-next-line import/no-unresolved
 import assets from './assets.json';
 
@@ -45,29 +45,9 @@ app.use(expressJwt({
 app.use(passport.initialize());
 
 app.use('/api/spider', SpiderRoute);
+app.use('/api/xuqiu', XuqiuRoute);
 
 app.set('trust proxy', true);
-
-app.get('/login/github', passport.authenticate('github', { scrope: ['user:email'], session: false }));
-
-app.get('/welcome', (req, res) => {
-  if (req.user) {
-    res.status(200);
-    res.send(`Hello, ${req.user.displayName}`);
-  } else {
-    res.redirect('/login/github');
-  }
-});
-
-app.get('/auth/github/callback',
-  passport.authenticate('github', { failureRedirect: '/', session: false }),
-  (req, res) => {
-    const expiresIn = 60 * 60 * 24 * 30; // 30 days
-    const token = jwt.sign(req.user, config.auth.jwt.secret, { expiresIn });
-    res.cookie('id_token', token, { maxAge: 1000 * expiresIn, httpOnly: true });
-    res.redirect('/');
-  },
-);
 
 app.get('*', async (req, res, next) => {
   try {
@@ -79,6 +59,13 @@ app.get('*', async (req, res, next) => {
 
     const initialState = {
       user: req.user || null,
+      xuqiu: {
+        yali: {
+          mean: '0',
+          std: '0',
+          last: '0',
+        },
+      },
     };
 
     const store = configureStore(initialState, {

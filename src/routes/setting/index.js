@@ -1,16 +1,16 @@
 import React from 'react';
-import Program from './Program';
+import Setting from './Setting';
 import Layout from '../../components/Layout';
 
-const title = '程序控制';
+const title = '项目配置';
 
 export default {
-  path: '/program',
+  path: '/setting',
 
   action() {
     return {
       title,
-      component: <Layout title={title}><Program /></Layout>,
+      component: <Layout title={title}><Setting /></Layout>,
     };
   },
 };

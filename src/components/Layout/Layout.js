@@ -151,27 +151,21 @@ function Layout({ title, children }) {
           <Divider />
           <List>
             <Link to="/" className={s.link}>
-              <ListItem button key="知识共享">
+              <ListItem button key="每日需求">
                 <ListItemIcon><DashboardIcon /></ListItemIcon>
-                <ListItemText primary="知识共享" />
+                <ListItemText primary="每日需求" />
               </ListItem>
             </Link>
-            <Link to="/chaxun" className={s.link}>
-              <ListItem button key="查询服务">
+            <Link to="/toushi" className={s.link}>
+              <ListItem button key="数据透视">
                 <ListItemIcon><InboxIcon /></ListItemIcon>
-                <ListItemText primary="查询服务" />
+                <ListItemText primary="数据透视" />
               </ListItem>
             </Link>
-            <Link to="/program" className={s.link}>
-              <ListItem button key="程序控制">
+            <Link to="/setting" className={s.link}>
+              <ListItem button key="项目配置">
                 <ListItemIcon><MailIcon /></ListItemIcon>
-                <ListItemText primary="程序控制" />
-              </ListItem>
-            </Link>
-            <Link to="/more" className={s.link}>
-              <ListItem button key="更多功能">
-                <ListItemIcon><MailIcon /></ListItemIcon>
-                <ListItemText primary="更多功能" />
+                <ListItemText primary="项目配置" />
               </ListItem>
             </Link>
           </List>

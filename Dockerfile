@@ -1,4 +1,4 @@
-FROM node:8.16.0-alpine
+FROM node:10.16.0
 
 # Copy application files
 COPY ./build /usr/src/app

@@ -2,12 +2,12 @@
 import React from 'react';
 
 
-class More extends React.Component {
+class Setting extends React.Component {
   render() {
     return (
-      <h2>更多功能</h2>
+      <h2>项目配置</h2>
     );
   }
 }
 
-export default More;
+export default Setting;

@@ -1,10 +1,13 @@
 import React from 'react';
-import ReactEcharts from 'echarts-for-react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
-import NoSsr from '@material-ui/core/NoSsr';
+import Grid from '@material-ui/core/Grid';
+
+// import Label from './label';
+import Today from './today';
+import History from './history';
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -13,6 +16,10 @@ const useStyles = makeStyles(theme => ({
   details: {
     display: 'flex',
     flexDirection: 'column',
+    width: '100%',
+  },
+  main: {
+    flexGrow: 1,
   },
   button: {
     margin: theme.spacing(1),
@@ -21,26 +28,12 @@ const useStyles = makeStyles(theme => ({
     flex: '1 0 auto',
   },
   meirixuqiu: {
-    width: 600,
     height: 400,
   },
 }));
 
 const XuqiuNum = () => {
   const classes = useStyles();
-  const option = {
-    xAxis: {
-      type: 'category',
-      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    },
-    yAxis: {
-      type: 'value',
-    },
-    series: [{
-      data: [820, 932, 901, 934, 1290, 1330, 1320],
-      type: 'line',
-    }],
-  };
   return (
     <Card className={classes.card}>
       <div className={classes.details}>
@@ -48,13 +41,18 @@ const XuqiuNum = () => {
           <Typography component="h5" variant="h5">
             需求数量
           </Typography>
-          <NoSsr>
-            <div className={classes.meirixuqiu}>
-              <ReactEcharts
-                option={option}
-              />
-            </div>
-          </NoSsr>
+          <div className={classes.main}>
+            <Grid container spacing={3} >
+              <Grid item xs={8}>
+                <div className={classes.meirixuqiu}>
+                  <History />
+                </div>
+              </Grid>
+              <Grid item xs={4}>
+                <Today />
+              </Grid>
+            </Grid>
+          </div>
         </CardContent>
       </div>
     </Card>
