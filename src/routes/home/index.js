@@ -1,16 +1,16 @@
 import React from 'react';
-import Home from './Home';
+import Meiri from '../meiri/Meiri';
 import Layout from '../../components/Layout';
 
-const title = '首页';
+const title = '每日需求';
 
 export default {
   path: '/',
 
-  action({ fetch }) {
+  async action({ fetch }) {
     return {
       title,
-      component: <Layout title={title}><Home fetch={fetch} /></Layout>,
+      component: <Layout title={title}><Meiri fetch={fetch} /></Layout>,
     };
   },
 };

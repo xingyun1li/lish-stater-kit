@@ -6,7 +6,7 @@ import XuqiuNum from '../../components/Widgets/XuqiuNum';
 import { setXuqiuAll, setXuqiuCurrent } from '../../actions/xuqiu';
 
 
-const Chaxun = ({ fetch, dispatch }) => {
+const Meiri = ({ fetch, dispatch }) => {
   useEffect(() => {
     async function fetchData() {
       const repsAll = await fetch('/api/xuqiu/all');
@@ -23,9 +23,9 @@ const Chaxun = ({ fetch, dispatch }) => {
   );
 };
 
-Chaxun.propTypes = {
+Meiri.propTypes = {
   fetch: PropTypes.func.isRequired,
   dispatch: PropTypes.func.isRequired,
 };
 
-export default connect()(Chaxun);
+export default connect()(Meiri);

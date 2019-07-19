@@ -1,4 +1,4 @@
-import { SET_XUQIU_ALL, SET_XUQIU_CURRENT } from '../constants';
+import { SET_XUQIU_ALL, SET_XUQIU_CURRENT, SET_YALI } from '../constants';
 
 export default function xuqiu(state = {}, action) {
   switch (action.type) {
@@ -11,6 +11,11 @@ export default function xuqiu(state = {}, action) {
       return {
         ...state,
         xuqiuCurrent: action.xuqiuCurrent,
+      };
+    case SET_YALI:
+      return {
+        ...state,
+        yali: action.yali,
       };
     default:
       return state;

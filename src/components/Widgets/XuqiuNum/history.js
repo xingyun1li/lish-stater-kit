@@ -4,11 +4,9 @@ import ReactEcharts from 'echarts-for-react';
 import PropTypes from 'prop-types';
 import NoSsr from '@material-ui/core/NoSsr';
 import { connect } from 'react-redux';
-import fill from 'lodash/fill';
 
 const History = ({ all }) => {
-  const { date, data } = all;
-  const ZTData = fill(Array(data.length), 0);
+  const [date, data, ZTData] = all;
   const option = {
     xAxis: {
       type: 'category',
@@ -64,17 +62,15 @@ const History = ({ all }) => {
 };
 
 History.propTypes = {
-  all: PropTypes.objectOf(
+  all: PropTypes.arrayOf(
+    PropTypes.array,
     PropTypes.array,
     PropTypes.array,
   ),
 };
 
 History.defaultProps = {
-  all: {
-    date: [],
-    data: [],
-  },
+  all: [[], [], []],
 };
 
 const mapStateToProps = state => ({

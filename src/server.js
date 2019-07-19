@@ -59,6 +59,13 @@ app.get('*', async (req, res, next) => {
 
     const initialState = {
       user: req.user || null,
+      xuqiu: {
+        yali: {
+          mean: '0',
+          std: '0',
+          last: '0',
+        },
+      },
     };
 
     const store = configureStore(initialState, {
