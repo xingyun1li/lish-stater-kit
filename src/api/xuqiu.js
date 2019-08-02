@@ -51,4 +51,24 @@ router.get('/yali', async (req, res) => {
   res.send(JSON.stringify(result));
 });
 
+router.get('/xiaoneng', async (req, res) => {
+  const junshi = await redisGet('xiaoneng:junshi');
+  const fanwei = await redisGet('xiaoneng:fanwei');
+  const tianshu = await redisGet('xiaoneng:tianshu');
+  const zengjia = await redisGet('xiaoneng:zengjia');
+  const zhouqi = await redisGet('xiaoneng:zhouqi');
+  const mean = await redisGet('xiaoneng:mean');
+  const std = await redisGet('xiaoneng:std');
+  const result = {
+    junshi: parseFloat(junshi).toFixed(2),
+    fanwei,
+    tianshu: parseFloat(tianshu).toFixed(0),
+    zengjia: parseFloat(zengjia).toFixed(2),
+    zhouqi: parseFloat(zhouqi).toFixed(2),
+    mean: parseFloat(mean).toFixed(2),
+    std: parseFloat(std).toFixed(2),
+  };
+  res.send(JSON.stringify(result));
+});
+
 export default router;
